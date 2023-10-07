@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: build-app-run-2stqg
+  namespace: default
+spec:
+  params:
+    - name: contextDir
+      value: quarkus
+    - name: revision
+      value: master
+    - name: sslVerify
+      value: 'false'
+    - name: subdirectory
+      value: ''
+    - name: tlsVerify
+      value: 'false'
+    - name: url
+      value: 'https://github.com/lmt-cbs/tekton-tutorial-greeter.git'
+  serviceAccountName: tekton-bot-sa.yaml
+  taskRef:
+    kind: Task
+    name: build-app
+  workspaces:
+    - emptyDir: {}
+      name: source

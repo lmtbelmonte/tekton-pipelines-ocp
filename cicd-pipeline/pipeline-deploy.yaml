@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: tekton-greeter-pipeline
+spec:
+  params:
+    - description: git url del repo a clonar
+      name: GIT_REPO
+      type: string
+    - description: referencia git de la branch
+      name: GIT_REF
+      type: string
+    - description: imagen destino del CI
+      name: DESTINATION_IMAGE
+      type: string
+    - description: script a ejecutar
+      name: SCRIPT
+      type: string    
+  tasks:
+    - name: build-push-app
+      params:
+        - name: url
+          value: $(params.GIT_REPO)
+        - name: revision
+          value: $(params.GIT_REF)
+        - name: destinationImage
+          value: $(params.DESTINATION_IMAGE)
+      taskRef:
+        name: build-push-app
+      workspaces:
+        - name: source
+    - name: deploy-app
+      taskRef:
+        name: kubectl
+      params:
+        - name: SCRIPT
+          value: "$(params.SCRIPT)"
+      workspaces:
+        - name: source
+      runAfter:
+        - build-push-app
+  workspaces:
+    - name: source    

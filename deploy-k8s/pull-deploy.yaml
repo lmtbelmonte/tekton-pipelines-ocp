@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kubectl
+spec:
+  params:
+    - name: SCRIPT
+      description: argumentos para ejecutar el kubectl
+      default: "kubectl help"
+      type: string
+  steps:
+    - image: 'quay.io/openshift/origin-cli:latest'
+      name: oc
+      script: |
+        #!/usr/bin/env bash
+
+        $(params.SCRIPT)
