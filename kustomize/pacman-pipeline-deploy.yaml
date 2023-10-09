@@ -1,0 +1,87 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pacman-pipeline
+spec:
+  params:
+    - default: 'https://github.com/lmt-cbs/pacman-kikd.git'
+      name: GIT_REPO
+      type: string
+    - default: master  
+      name: GIT_REVISION
+      type: string
+    - default: quay.io/lmtbelmonte01/packman-kikd
+      name: DESTINATION_IMAGE
+      type: string
+    - default: .
+      name: CONTEXT_DIR
+      type: string
+    - default: 'https://github.com/lmt-cbs/pacman-kikd-manifests.git'
+      name: CONFIG_GIT_REPO
+      type: string
+    - default: main
+      name: CONFIG_GIT_REVISION
+      type: string
+  tasks:
+    - name: fetch-repo
+      params:
+        - name: url
+          value: $(params.GIT_REPO)
+        - name: revision
+          value: $(params.GIT_REF)
+        - name: deleteExisting
+          value: 'true'
+        - name: verbose
+          value: 'true'
+      taskRef:
+        kind: Task
+        name: git-clone
+      workspaces:
+      - name: output
+        workspace: app-source
+    - name: build-app
+      params:
+        - name: GOALS
+          value:
+          - clean
+          - package
+        - name: CONTEXT_DIR
+          value: $(params.CONTEXT_DIR)
+      runAfter:
+      - fetch-repo
+      taskRef:
+        kind: Task
+        name: maven
+      workspaces:
+      - name: maven-settings
+        workspace: maven-settings
+      - name: source
+        workspace: app-source
+    - name: build-push-image
+      params:
+        - name: IMAGE
+          value: $(params.DESTINATION_IMAGE)
+        - name: DOCKERFILE
+          value: $(params.IMAGE_DOCKERFILE)
+        - name: CONTEXT
+          value: $(params.IMAGE_CONTEXT_DIR)
+      runAfter:
+      - build-app
+      taskRef:
+        kind: Task
+        name: buildah
+      workspaces:
+      - name: source
+        workspace: app-source
+    - name: deploy
+      params:
+      - name: script
+        value: $(params.SCRIPT)
+      runAfter:
+      - build-push-image
+      taskRef:
+        kind: Task
+        name: kubernetes-actions
+  workspaces:
+    - name: app-source
+    - name: maven-settings
