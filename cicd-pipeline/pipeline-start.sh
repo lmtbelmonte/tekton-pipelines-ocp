@@ -1,5 +1,5 @@
 #!/bin/bash
-tkn pipeline start tekton-greeter-pipeline-hub \
+tkn pipeline start greeter-pipeline-hub \
  --serviceaccount='tekton-deployer-sa' \
  --param GIT_REPO='https://github.com/lmt-cbs/tekton-tutorial-greeter.git' \
  --param GIT_REF='master' \

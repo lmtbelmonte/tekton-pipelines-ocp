@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: tekton-greeter-pipeline-hub
+  name: greeter-pipeline-hub
 spec:
   params:
     - default: 'https://github.com/lmt-cbs/tekton-tutorial-greeter.git'
