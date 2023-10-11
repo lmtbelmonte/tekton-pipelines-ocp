@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
-  name: tekton-greeter-eventlistener
+  name: greeter-eventlistener
 spec:
   serviceAccountName: tekton-triggers-sa
   triggers:
   - bindings:
-    - ref: tekton-greeter-triggerbinding
+    - ref: greeter-triggerbinding
     template:
-      ref: tekton-greeter-triggertemplate
+      ref: greeter-triggertemplate
