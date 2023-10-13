@@ -11,11 +11,11 @@ spec:
     - name: DESTINATION_IMAGE
       value: 'quay.io/lmtbelmonte01/tekton-greeter-pipeline:latest'
     - name: IMAGE_DOCKERFILE
-      value: 'quarkus/Dockerfile'
+      value: quarkus/Dockerfile
     - name: CONTEXT_DIR
-      value: 'quarkus'
+      value: quarkus
     - name: IMAGE_CONTEXT_DIR
-      value: 'quarkus'    
+      value: quarkus 
     - name: SCRIPT
       value: >
         kubectl create deploy tekton-greeter --image=quay.io/lmtbelmonte01/tekton-greeter-pipeline:latest
@@ -30,4 +30,4 @@ spec:
         claimName: app-source-pvc  
   podTemplate:
     securityContext:
-      fsGroup: 65532 
+      fsGroup: 65532     
