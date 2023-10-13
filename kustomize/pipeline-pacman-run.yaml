@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: pacman-pipeline-run-
+spec:
+  params:
+    - name: GIT_REPO
+      value: 'https://github.com/lmt-cbs/pacman-kikd.git'
+    - name: GIT_REVISION
+      value: main
+    - name: DESTINATION_IMAGE
+      value: 'quay.io/lmtbelmonte01/pacman-kikd:latest'
+    - name: CONFIG_GIT_REPO
+      value: 'https://github.com/lmt-cbs/pacman-kikd-manifests.git'
+    - name: CONFIG_GIT_REVISION
+      value: main
+  pipelineRef:
+    name: pacman-pipeline
+  serviceAccountName: tekton-bot-sa
+  workspaces:
+    - name: maven-settings
+      emptyDir: {}
+    - name: app-source
+      persistentVolumeClaim:
+        claimName: app-source-pvc  
+  podTemplate:
+    securityContext:
+      fsGroup: 65532     

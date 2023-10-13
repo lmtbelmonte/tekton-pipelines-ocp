@@ -1,29 +1,26 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: tekton-greeter-pipeline-hub
+  name: pacman-pipeline
 spec:
   params:
-    - default: 'https://github.com/lmt-cbs/tekton-tutorial-greeter.git'
+    - default: 'https://github.com/lmt-cbs/pacman-kikd.git'
       name: GIT_REPO
       type: string
-    - default: master  
-      name: GIT_REF
+    - default: master
+      name: GIT_REVISION
       type: string
-    - default: quay.io/lmtbelmonte01/tekton-greeter-pipeline:latest
+    - default: quay.io/lmtbelmonte01/pacman-kikd
       name: DESTINATION_IMAGE
       type: string
-    - default: kubectl create deploy tekton-greeter --image=quay.io/lmtbelmonte01/tekton-greeter-pipeline:latest
-      name: SCRIPT
-      type: string
-    - default: ./Dockerfile
+    - default: .
       name: CONTEXT_DIR
       type: string
-    - default: .
-      name: IMAGE_DOCKERFILE
+    - default: 'https://github.com/lmt-cbs/pacman-kikd-manifests.git'
+      name: CONFIG_GIT_REPO
       type: string
-    - default: .
-      name: IMAGE_CONTEXT_DIR
+    - default: main
+      name: CONFIG_GIT_REVISION
       type: string
   tasks:
     - name: fetch-repo
@@ -31,13 +28,10 @@ spec:
         - name: url
           value: $(params.GIT_REPO)
         - name: revision
-          value: $(params.GIT_REF)
+          value: $(params.GIT_REVISION)
         - name: deleteExisting
-          value: 'true'
-        - name: verbose
-          value: 'true'
+          value: "true"
       taskRef:
-        kind: Task
         name: git-clone
       workspaces:
       - name: output
@@ -53,7 +47,6 @@ spec:
       runAfter:
       - fetch-repo
       taskRef:
-        kind: Task
         name: maven
       workspaces:
       - name: maven-settings
@@ -64,27 +57,33 @@ spec:
       params:
         - name: IMAGE
           value: $(params.DESTINATION_IMAGE)
-        - name: DOCKERFILE
-          value: $(params.IMAGE_DOCKERFILE)
-        - name: CONTEXT
-          value: $(params.IMAGE_CONTEXT_DIR)
       runAfter:
-      - build-app
+        - build-app
       taskRef:
-        kind: Task
         name: buildah
       workspaces:
       - name: source
         workspace: app-source
-    - name: deploy
+    - name: git-update-deployment
       params:
-      - name: script
-        value: $(params.SCRIPT)
+      - name: GIT_REPOSITORY
+        value: $(params.CONFIG_GIT_REPO)
+      - name: NEW_IMAGE
+        value: $(params.DESTINATION_IMAGE)
+      - name: NEW_DIGEST
+        value: $(tasks.build-push-image.results.IMAGE_DIGEST)
+      - name: KUSTOMIZATION_PATH
+        value: env/dev
+      - name: GIT_REF
+        value: $(params.CONFIG_GIT_REVISION)
       runAfter:
       - build-push-image
       taskRef:
         kind: Task
-        name: kubernetes-actions
+        name: git-update-deployment
+      workspaces:
+      - name: workspace
+        workspace: app-source  
   workspaces:
     - name: app-source
     - name: maven-settings
