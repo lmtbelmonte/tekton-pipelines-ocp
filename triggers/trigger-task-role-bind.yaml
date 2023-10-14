@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: trigger-task-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: tekton-triggers-sa
+roleRef:
+  kind: Role
+  name: task-role
+  apiGroup: rbac.authorization.k8s.io
