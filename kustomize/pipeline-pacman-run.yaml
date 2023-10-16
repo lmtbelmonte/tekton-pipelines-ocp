@@ -16,7 +16,7 @@ spec:
       value: main
   pipelineRef:
     name: pacman-pipeline
-  serviceAccountName: tekton-bot-sa
+  serviceAccountName: tekton-triggers-sa
   workspaces:
     - name: maven-settings
       emptyDir: {}
@@ -25,4 +25,4 @@ spec:
         claimName: app-source-pvc  
   podTemplate:
     securityContext:
-      fsGroup: 65532     
+      fsGroup: 65532         

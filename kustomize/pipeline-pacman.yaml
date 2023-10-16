@@ -7,7 +7,7 @@ spec:
     - default: 'https://github.com/lmt-cbs/pacman-kikd.git'
       name: GIT_REPO
       type: string
-    - default: master
+    - default: main
       name: GIT_REVISION
       type: string
     - default: quay.io/lmtbelmonte01/pacman-kikd
@@ -45,14 +45,14 @@ spec:
         - name: CONTEXT_DIR
           value: $(params.CONTEXT_DIR)
       runAfter:
-      - fetch-repo
+        - fetch-repo
       taskRef:
         name: maven
       workspaces:
-      - name: maven-settings
-        workspace: maven-settings
-      - name: source
-        workspace: app-source
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: app-source
     - name: build-push-image
       params:
         - name: IMAGE
@@ -62,8 +62,8 @@ spec:
       taskRef:
         name: buildah
       workspaces:
-      - name: source
-        workspace: app-source
+        - name: source
+          workspace: app-source
     - name: git-update-deployment
       params:
       - name: GIT_REPOSITORY
@@ -77,7 +77,7 @@ spec:
       - name: GIT_REF
         value: $(params.CONFIG_GIT_REVISION)
       runAfter:
-      - build-push-image
+        - build-push-image
       taskRef:
         kind: Task
         name: git-update-deployment
@@ -85,5 +85,5 @@ spec:
       - name: workspace
         workspace: app-source  
   workspaces:
-    - name: app-source
-    - name: maven-settings
+     - name: app-source
+     - name: maven-settings
