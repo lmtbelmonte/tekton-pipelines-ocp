@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: helm-pacman-run
+spec:
+  serviceAccountName: tekton-deployer-sa
+  taskRef:
+    name: helm-upgrade-from-repo
+  params:
+  - name: helm_repo
+    value: https://gitops-cookbook.github.io/helm-charts/
+  - name: chart_name
+    value: gitops-cookbook/pacman
+  - name: release_version
+    value: 0.1.0
+  - name: release_name
+    value: pacman
+  - name: overwrite_values
+    value: replicaCount=2
