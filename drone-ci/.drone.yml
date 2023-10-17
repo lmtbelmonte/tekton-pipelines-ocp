@@ -1,0 +1,39 @@
+kind: pipeline
+type: docker
+name: java-pipeline
+platform:
+  os: linux
+  arch: arm64
+trigger:
+  branch:
+    - main
+clone:
+  disable: true
+steps:
+  - name: clone sources
+    image: alpine/git
+    pull: if-not-exists
+    commands:
+      - git clone https://github.com/lmt-cbs/cotd-lmt .
+      - git checkout $DRONE_COMMIT
+  - name: maven-build
+    image: maven:3-jdk-11
+    commands:
+      - mvn install -DskipTests=true -B
+      - mvn test -B
+  - name: publish
+    image: plugins/docker:20.13
+    pull: if-not-exists
+    settings:
+      tags: "latest"
+      dockerfile: Dockerfile
+      insecure: true
+      mtu: 1400
+      username:
+        from_secret: image_registry_user
+      password:
+        from_secret: image_registry_password
+      registry:
+        from_secret: image_registry
+      repo:
+        from_secret: destination_image    
