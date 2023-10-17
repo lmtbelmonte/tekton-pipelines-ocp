@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export DRONE_GITHUB_CLIENT_ID=
+export DRONE_GITHUB_CLIENT_SECRET=
+export DRONE_RPC_SECRET=
+export DRONE_SERVER_HOST=
+export DRONE_SERVER_PROTO=http
+export DRONE_USER_FILTER=lmt-cbs
